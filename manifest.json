@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "Omni Table to CSV",
+  "version": "1.0.0",
+  "description": "Exports the result table on an Omni dashboard or workbook to CSV, including rows not currently rendered on screen.",
+  "permissions": ["scripting"],
+  "host_permissions": ["https://*.omniapp.co/*"],
+  "background": { "service_worker": "background.js" },
+  "action": {
+    "default_title": "Export table to CSV",
+    "default_icon": { "16": "icons/16.png", "48": "icons/48.png", "128": "icons/128.png" }
+  },
+  "icons": { "16": "icons/16.png", "48": "icons/48.png", "128": "icons/128.png" },
+  "commands": {
+    "export-csv": {
+      "suggested_key": { "default": "Ctrl+Shift+E", "mac": "Command+Shift+E" },
+      "description": "Export the Omni result table to CSV"
+    }
+  }
+}
