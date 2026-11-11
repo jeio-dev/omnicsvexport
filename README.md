@@ -12,9 +12,9 @@ One-click CSV export for Omni result tables, for accounts without download permi
 
 ## Use
 
-Open an Omni dashboard or workbook, wait for the table to finish loading, then click the toolbar icon (or press `Ctrl+Shift+E`, `Cmd+Shift+E` on Mac).
+Open an Omni dashboard or workbook, wait for the table to finish loading, then click the toolbar icon. The popup lists every result table it finds with its row and column count and a preview of the column names. Nothing is exported until you click **Export** next to the one you want. Errors and the exported filename show in the popup.
 
-The badge on the icon confirms the result: a green row count on success, red `ERR` on failure, grey `—` if the tab isn't an Omni page. On failure, right-click the icon → *Inspect service worker* for the reason.
+**Shortcut:** `Ctrl+Shift+E` (`Cmd+Shift+E` on Mac) skips the popup and immediately exports the table with the most rows. The badge on the icon confirms the result: a green row count on success, red `ERR` on failure, grey `—` if the tab isn't an Omni page. On failure, right-click the icon → *Inspect service worker* for the reason.
 
 Files land in your normal Chrome download folder, named after the dashboard and the applied date filter:
 
@@ -31,7 +31,7 @@ Instead it walks the React fiber to the component rendering the tile and reads t
 - `rawData` — one object per row, keyed by fully-qualified field name, **the entire result set** regardless of scroll position
 - `resultFields` — column metadata: display label, field name, and type
 
-Because these are page objects, the code must run in the `MAIN` world. An ordinary isolated-world content script cannot see them, which is why this is an injected `chrome.scripting.executeScript` call rather than a declared content script.
+Because these are page objects, the code must run in the `MAIN` world. An ordinary isolated-world content script cannot see them, which is why this is an injected `chrome.scripting.executeScript` call rather than a declared content script. The injected function lives in `extract.js`, shared by the popup and the shortcut handler. The popup only ever receives counts and column names; row data stays in the page.
 
 ### The decimal trap
 
@@ -68,7 +68,9 @@ The file is written UTF-8 with a BOM so Excel gets the encoding right on double-
 
 ## Scope
 
-Works on any Omni page with a result table, not just this dashboard. If a dashboard has several table tiles, it exports the one with the most rows. Non-table tiles (the KPI stat cards) are ignored.
+Works on any Omni page with a result table, not just this dashboard. If a dashboard has several table tiles, the popup lists them all, largest first, and the keyboard shortcut exports the one with the most rows. Non-table tiles (the KPI stat cards) are ignored.
+
+Tables are identified by row count and column names, not by tile title, because the popup has no reliable way to read tile titles from Omni's page. If the table changes between opening the popup and clicking **Export** (the query re-ran, say), the export is refused with a message rather than exporting a different table.
 
 ## When it will break
 
@@ -82,3 +84,9 @@ The genuinely durable fix is getting download permission or an API token from yo
 - `https://*.omniapp.co/*` — restricts that injection to Omni
 
 No `downloads` permission: the CSV is written via a blob URL from the page itself. No network calls, no storage, no data leaves the browser.
+
+## Credits and disclaimer
+
+Created by Jeio — <https://github.com/jeio-dev/omnicsvexport>. Released under the [MIT License](LICENSE).
+
+This is an unofficial tool. It is not affiliated with or endorsed by Omni, and "Omni" is used only to describe the product it works with. It depends on undocumented page internals and may stop working without notice.
